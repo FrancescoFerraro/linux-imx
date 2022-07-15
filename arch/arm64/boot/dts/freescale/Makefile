@@ -91,7 +91,7 @@ dtb-$(CONFIG_ARCH_MXC) += imx8mn-evk.dtb imx8mn-evk-rm67191.dtb imx8mn-evk-rpmsg
 			  imx8mn-evk-iqaudio-dacplus.dtb imx8mn-evk-iqaudio-dacpro.dtb imx8mn-evk-hifiberry-dacplus.dtb \
 			  imx8mn-evk-rm67199.dtb \
 			  imx8mn-ddr3l-evk-ak5558.dtb imx8mn-ddr3l-evk-rpmsg.dtb
-			  imx8mn-var-som-symphony.dtb imx8mn-var-som-symphony-legacy.dtb \
+dtb-$(CONFIG_ARCH_MXC) += imx8mn-var-som-symphony.dtb imx8mn-var-som-symphony-legacy.dtb \
 			  imx8mn-var-som-symphony-m7.dtb imx8mn-var-som-symphony-legacy-m7.dtb \
 			  imx8mn-var-som-symphony-root.dtb imx8mn-var-som-symphony-legacy-root.dtb imx8mn-var-som-inmate.dtb
 dtb-$(CONFIG_ARCH_MXC) += imx8mn-ddr4-evk.dtb imx8mn-ddr4-evk-ak5558.dtb imx8mn-ddr4-evk-rm67191.dtb \

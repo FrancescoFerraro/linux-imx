@@ -240,6 +240,37 @@ static int fsl_asoc_card_hw_params(struct snd_pcm_substream *substream,
 		}
 	}
 
+	if (of_device_is_compatible(dev->of_node, "fsl,imx-audio-wm8904")) {
+		ret = snd_soc_dai_set_tdm_slot(asoc_rtd_to_cpu(rtd, 0), 0, 0, 2,
+					       params_physical_width(params));
+		if (ret) {
+			dev_err(dev, "failed to set TDM slot for cpu dai\n");
+			return ret;
+		}
+
+		if (priv->sample_format == SNDRV_PCM_FORMAT_S24_LE)
+			pll_out = priv->sample_rate * 384;
+		else
+			pll_out = priv->sample_rate * 256;
+
+		ret = snd_soc_dai_set_pll(asoc_rtd_to_codec(rtd, 0), codec_priv->pll_id,
+					  codec_priv->pll_id,
+					  codec_priv->mclk_freq, pll_out);
+		if (ret) {
+			dev_err(dev, "failed to start FLL: %d\n", ret);
+			return ret;
+		}
+
+		ret = snd_soc_dai_set_sysclk(asoc_rtd_to_codec(rtd, 0), codec_priv->fll_id,
+					     pll_out, SND_SOC_CLOCK_IN);
+		if (ret) {
+			dev_err(dev, "failed to set SYSCLK: %d\n", ret);
+			return ret;
+		}
+
+		return 0;
+	}
+
 	/* Specific configuration for PLL */
 	for_each_rtd_codec_dais(rtd, codec_idx, codec_dai) {
 		codec_priv = &priv->codec_priv[codec_idx];
@@ -997,10 +1028,17 @@ static int fsl_asoc_card_probe(struct platform_device *pdev)
 			priv->codec_priv[0].mclk = devm_clk_get(codec_dev[0], NULL);
 	} else if (of_device_is_compatible(np, "fsl,imx-audio-wm8904")) {
 		codec_dai_name[0] = "wm8904-hifi";
-		priv->codec_priv[0].mclk_id = WM8904_FLL_MCLK;
+		priv->card.set_bias_level = NULL;
+		priv->codec_priv[0].mclk_id = WM8904_CLK_FLL;
 		priv->codec_priv[0].fll_id = WM8904_CLK_FLL;
 		priv->codec_priv[0].pll_id = WM8904_FLL_MCLK;
-		priv->dai_fmt |= SND_SOC_DAIFMT_CBP_CFP;
+		priv->dai_fmt |= SND_SOC_DAIFMT_CBM_CFM;
+		if (strstr(cpu_np->name, "esai")) {
+			priv->cpu_priv.sysclk_freq[TX] = priv->codec_priv[0].mclk_freq;
+			priv->cpu_priv.sysclk_freq[RX] = priv->codec_priv[0].mclk_freq;
+			priv->cpu_priv.sysclk_dir[TX] = SND_SOC_CLOCK_OUT;
+			priv->cpu_priv.sysclk_dir[RX] = SND_SOC_CLOCK_OUT;
+		}
 		priv->card_type = CARD_WM8904;
 	} else if (of_device_is_compatible(np, "fsl,imx-audio-spdif")) {
 		ret = fsl_asoc_card_spdif_init(codec_np, cpu_np, codec_dai_name, priv);

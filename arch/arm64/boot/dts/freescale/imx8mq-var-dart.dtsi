@@ -297,6 +297,7 @@
 		reg = <0x2c>;
 		status = "disabled";
 		enable-gpios = <&gpio1 11 GPIO_ACTIVE_HIGH>;
+		pinctrl-0 = <&pinctrl_lvds>;
 
 		ports {
 			#address-cells = <1>;

@@ -874,6 +874,9 @@ static int at803x_probe(struct phy_device *phydev)
 	if (ret)
 		return ret;
 
+	const struct regulator_ops *vddio_ops = priv->vddio_rdev->desc->ops;
+	priv->vddio_last_selector = vddio_ops->get_voltage_sel(priv->vddio_rdev);
+
 	if (phydev->drv->phy_id == ATH8031_PHY_ID) {
 		int ccr = phy_read(phydev, AT803X_REG_CHIP_CONFIG);
 		int mode_cfg;

@@ -8,6 +8,10 @@
 
 #include "imx93-var-som.dtsi"
 
+&ele_mu {
+	memory-region = <&ele_reserved>;
+};
+
 / {
 	model = "Variscite VAR-SOM-MX93 on Symphony-Board";
 
@@ -147,6 +151,7 @@
 		regulator-min-microvolt = <3300000>;
 		regulator-max-microvolt = <3300000>;
 		gpio = <&gpio2 18 GPIO_ACTIVE_HIGH>;
+		off-on-delay-us = <12000>;
 		enable-active-high;
 	};
 
@@ -195,7 +200,7 @@
 			no-map;
 		};
 
-		rsc_table: rsc_table@2021f000 {
+		rsc_table: rsc-table@2021f000 {
 			reg = <0 0x2021f000 0 0x1000>;
 			no-map;
 		};
@@ -203,6 +208,12 @@
 		vdevbuffer: vdevbuffer@87f00000 {
 			compatible = "shared-dma-pool";
 			reg = <0 0x87f00000 0 0x100000>;
+			no-map;
+		};
+
+		ele_reserved: ele-reserved@87de0000 {
+			compatible = "shared-dma-pool";
+			reg = <0 0x87de0000 0 0x100000>;
 			no-map;
 		};
 	};
@@ -522,6 +533,10 @@
 	pinctrl-names = "default";
 	pinctrl-0 = <&pinctrl_uart7>;
 	status = "disabled";
+};
+
+&media_blk_ctrl {
+	status = "okay";
 };
 
 &mu1 {

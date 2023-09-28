@@ -262,7 +262,7 @@
 &fec {
 	pinctrl-names = "default";
 	pinctrl-0 = <&pinctrl_enet_4>;
-	phy-mode = "rgmii";
+	phy-mode = "rgmii-id";
 	phy-handle = <&ethphy>;
 	phy-reset-on-resume;
 	status = "okay";
@@ -273,8 +273,9 @@
 
 		ethphy: ethernet-phy@7 {
 			reg = <7>;
+			compatible = "ethernet-phy-ieee802.3-c22";
 			assigned-clocks = <&clks IMX6QDL_CLK_ENET_REF>;
-			qca,clk-out-frequency = <125000000>;
+			assigned-clock-rates = <125000000>;
 			reset-gpios = <&gpio1 25 GPIO_ACTIVE_LOW>;
 			reset-assert-us = <100000>;
 		};

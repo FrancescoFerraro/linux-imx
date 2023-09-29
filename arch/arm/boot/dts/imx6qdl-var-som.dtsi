@@ -724,13 +724,13 @@
 	/* an 8 MiB partition */
 	partition@2 {
 		label = "kernel";
-		reg = <0x00400000 0x00800000>;
+		reg = <0x00400000 0x00c00000>;
 	};
 
 	/* a 1012 MiB partition */
 	partition@3 {
 		label = "rootfs";
-		reg = <0x00c00000 0x3f400000>;
+		reg = <0x01000000 0x3f000000>;
 	};
 };
 

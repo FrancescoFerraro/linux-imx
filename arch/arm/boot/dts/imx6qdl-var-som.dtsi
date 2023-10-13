@@ -231,7 +231,7 @@
 	pinctrl-names = "default", "sleep";
 	pinctrl-0 = <&pinctrl_ecspi3>;
 	pinctrl-1 = <&pinctrl_ecspi3_sleep>;
-	cs-gpios = <&gpio4 24 GPIO_ACTIVE_LOW>;
+	cs-gpios = <&gpio4 24 GPIO_ACTIVE_HIGH>;
 	status = "okay";
 
 	/* Touch */
@@ -243,7 +243,7 @@
 		interrupt-parent = <&gpio4>;
 		interrupts = <25 0>;
 		spi-max-frequency = <1500000>;
-		pendown-gpio = <&gpio4 25 GPIO_ACTIVE_LOW>;
+		pendown-gpio = <&gpio4 25 GPIO_ACTIVE_HIGH>;
 		ti,x-min = /bits/ 16 <125>;
 		ti,x-max = /bits/ 16 <4008>;
 		ti,y-min = /bits/ 16 <282>;

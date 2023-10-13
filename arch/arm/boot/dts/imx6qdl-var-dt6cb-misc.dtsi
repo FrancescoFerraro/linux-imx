@@ -24,21 +24,21 @@
 
 		home {
 			label = "Home";
-			gpios = <&gpio5 11 GPIO_ACTIVE_HIGH>;
+			gpios = <&gpio5 11 GPIO_ACTIVE_LOW>;
 			linux,code = <KEY_HOMEPAGE>; /* KEY_HOMEPAGE */
 			gpio-key,wakeup;
 		};
 
 		back {
 			label = "Back";
-			gpios = <&gpio4 26 GPIO_ACTIVE_HIGH>;
+			gpios = <&gpio4 26 GPIO_ACTIVE_LOW>;
 			linux,code = <KEY_BACK>; /* KEY_BACK */
 			gpio-key,wakeup;
 		};
 
 		menu {
 			label = "Menu";
-			gpios = <&gpio4 25 GPIO_ACTIVE_HIGH>;
+			gpios = <&gpio4 25 GPIO_ACTIVE_LOW>;
 			linux,code = <KEY_MENU>; /* KEY_MENU */
 			gpio-key,wakeup;
 		};
@@ -87,8 +87,8 @@
 		pinctrl-0 = <&pinctrl_ov564x_mipi>;
 		clocks = <&clks IMX6QDL_CLK_CKO2>;
 		clock-names = "csi_mclk";
-		pwn-gpios = <&gpio3 13 GPIO_ACTIVE_HIGH>;
-		rst-gpios = <&gpio4 10 GPIO_ACTIVE_LOW>;
+		pwn-gpios = <&gpio3 13 GPIO_ACTIVE_LOW>;
+		rst-gpios = <&gpio4 10 GPIO_ACTIVE_HIGH>;
 		csi_id = <1>;
 		mclk = <24000000>;
 		mclk_source = <0>;
@@ -231,9 +231,9 @@
 &pcie {
 	pinctrl-names = "default";
 	pinctrl-0 = <&pinctrl_pcie>;
-	reset-gpio    = <&gpio4 11 GPIO_ACTIVE_LOW>;	/* gpio pin num of power good signal */
-	wake-up-gpio  = <&gpio4 31 GPIO_ACTIVE_HIGH>;	/* gpio pin num of incoming wakeup signal */
-	disable-gpio  = <&gpio5 5 GPIO_ACTIVE_LOW>;	/* gpio pin num of outgoing rfkill/endpoint disable signal */
+	reset-gpio    = <&gpio4 11 GPIO_ACTIVE_HIGH>;	/* gpio pin num of power good signal */
+	wake-up-gpio  = <&gpio4 31 GPIO_ACTIVE_LOW>;	/* gpio pin num of incoming wakeup signal */
+	disable-gpio  = <&gpio5 5 GPIO_ACTIVE_HIGH>;	/* gpio pin num of outgoing rfkill/endpoint disable signal */
 	status = "okay";
 };
 
@@ -247,7 +247,7 @@
 &reg_usb_h1_vbus {
 	pinctrl-names = "default";
 	pinctrl-0 = <&pinctrl_usb_h1_vbus>;
-	gpio = <&gpio1 28 GPIO_ACTIVE_LOW>;
+	gpio = <&gpio1 28 GPIO_ACTIVE_HIGH>;
 	enable-active-high;
 };
 
@@ -275,7 +275,7 @@
 &usdhc2 {	/* uSDHC2, MMC/SD card */
 	pinctrl-names = "default";
 	pinctrl-0 = <&pinctrl_usdhc2_2>, <&pinctrl_usdhc2_gpio>;
-	cd-gpios = <&gpio1 6 GPIO_ACTIVE_HIGH>;
+	cd-gpios = <&gpio1 6 GPIO_ACTIVE_LOW>;
 	no-1-8-v;
 	keep-power-in-suspend;
 	enable-sdio-wakeup;

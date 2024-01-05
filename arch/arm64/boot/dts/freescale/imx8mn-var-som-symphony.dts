@@ -8,12 +8,14 @@
 
 #include <dt-bindings/usb/pd.h>
 #include "imx8mn-var-som.dtsi"
+#include "imx8mn-android.dtsi"
 
 / {
 	model = "Variscite VAR-SOM-MX8M-NANO on Symphony-Board";
 
 	chosen {
 		stdout-path = &uart4;
+		bootargs-append="console=ttymxc3,115200 earlycon=ec_imx6q,0x30a60000,115200 loglevel=8 androidboot.wifisdio=30b40000.mmc androidboot.btmmchost=mmc0 androidboot.wificountrycode=US";
 	};
 
 	backlight: backlight {
@@ -48,7 +50,7 @@
 		home {
 			label = "Home";
 			gpios = <&pca9534 2 GPIO_ACTIVE_LOW>;
-			linux,code = <KEY_HOME>;
+			linux,code = <KEY_HOMEPAGE>;
 			wakeup-source;
 		};
 
@@ -86,6 +88,10 @@
 		gpio = <&gpio4 22 GPIO_ACTIVE_HIGH>;
 		off-on-delay = <20000>;
 		enable-active-high;
+	};
+
+	sound-wm8904 {
+		status = "okay";
 	};
 };
 
@@ -355,6 +361,10 @@
 	status = "okay";
 };
 
+&lcdif {
+	/delete-property/ trusty;
+};
+
 &mipi_csi_1 {
 	#address-cells = <1>;
 	#size-cells = <0>;
@@ -377,6 +387,8 @@
 	data-mapping = "jeida-24";
 	width-mm = <154>;
 	height-mm = <87>;
+	backlight = <&backlight>;
+	status = "okay";
 
 	panel-timing {
 		clock-frequency = <39000000>;

@@ -273,15 +273,6 @@
 	};
 };
 
-&tca_mux {
-	lane-swapp-disable-quirk;
-	port {
-		usb3_data_ss: endpoint {
-			remote-endpoint = <&typec_con_ss>;
-		};
-	};
-};
-
 &lpi2c8 {
 	pca6408_1: gpio@20 {
 		compatible = "nxp,pcal6408";
@@ -319,6 +310,13 @@
 
 &usb3_phy {
 	status = "okay";
+
+	lane-swapp-disable-quirk;
+	port {
+		usb3_data_ss: endpoint {
+			remote-endpoint = <&typec_con_ss>;
+		};
+	};
 };
 
 &usb3_dwc3 {

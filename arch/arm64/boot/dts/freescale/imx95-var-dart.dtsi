@@ -234,13 +234,11 @@
 	pinctrl-0 = <&pinctrl_uart5>, <&pinctrl_bt>;
 	status = "okay";
 
-#if 0
 	bluetooth {
 		compatible = "nxp,88w8987-bt";
 		/* U-blox 88Q9098 module use the 3Mbps by default */
 		fw-init-baudrate = <3000000>;
 	};
-#endif
 };
 
 &mu7 {

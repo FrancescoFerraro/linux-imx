@@ -7,6 +7,7 @@
 
 #include <dt-bindings/phy/phy-imx8-pcie.h>
 #include <dt-bindings/usb/pd.h>
+#include <dt-bindings/net/mxl-8611x.h>
 #include "imx95.dtsi"
 
 #define FALLING_EDGE		BIT(0)
@@ -271,6 +272,16 @@
 		reg = <0>;
 		compatible = "ethernet-phy-ieee802.3-c22";
 		eee-broken-1000t;
+		mxl-8611x,led0_cfg = <(
+			MXL8611X_LEDX_CFG_LINK_UP_RX_ACT_ON |
+			MXL8611X_LEDX_CFG_LINK_UP_TX_ACT_ON |
+			MXL8611X_LEDX_CFG_TRAFFIC_ACT_BLINK_IND
+		)>;
+		mxl-8611x,led1_cfg = <(
+			MXL8611X_LEDX_CFG_LINK_UP_10MB_ON |
+			MXL8611X_LEDX_CFG_LINK_UP_100MB_ON |
+			MXL8611X_LEDX_CFG_LINK_UP_1GB_ON
+		)>;
 	};
 };
 
@@ -481,5 +492,4 @@
 	pinctrl-3 = <&pinctrl_usdhc3>, <&pinctrl_usdhc3_gpio>;
 	mmc-pwrseq = <&usdhc3_pwrseq>;
 	status = "okay";
-
 };

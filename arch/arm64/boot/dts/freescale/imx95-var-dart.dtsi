@@ -156,7 +156,6 @@
 		post-power-on-delay-ms = <100>;
 		power-off-delay-us = <10000>;
 		reset-gpios = <&gpio4 29 GPIO_ACTIVE_LOW>,	/* WIFI_RESET */
-			      <&gpio4 28 GPIO_ACTIVE_LOW>,	/* BT_RESET_EN */
 			      <&gpio2 27 GPIO_ACTIVE_LOW>;	/* WIFI_PWR_EN */
 		status = "okay";
 	};
@@ -232,12 +231,11 @@
 	/* BT */
 	pinctrl-names = "default";
 	pinctrl-0 = <&pinctrl_uart5>, <&pinctrl_bt>;
+	uart-has-rtscts;
 	status = "okay";
 
 	bluetooth {
 		compatible = "nxp,88w8987-bt";
-		/* U-blox 88Q9098 module use the 3Mbps by default */
-		fw-init-baudrate = <3000000>;
 	};
 };
 
@@ -474,6 +472,7 @@
 	status = "okay";
 };
 
+/* WiFi */
 &usdhc3 {
 	pinctrl-names = "default","state_100mhz","state_200mhz","sleep";
 	pinctrl-0 = <&pinctrl_usdhc3>, <&pinctrl_usdhc3_gpio>;

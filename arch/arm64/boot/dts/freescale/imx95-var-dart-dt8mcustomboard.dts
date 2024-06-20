@@ -220,17 +220,7 @@
 		compatible = "edt,edt-ft5206";
 		reg = <0x38>;
 		pinctrl-names = "default";
-
-
 		pinctrl-0 = <&pinctrl_captouch>;
-/*
-root@imx95-var-dart:~# modprobe edt-ft5x06
-[   22.423654] scmi-pinctrl scmi_dev.6: Error parsing config -13
-[   22.429430] scmi-pinctrl scmi_dev.6: pin_config_set op failed for pin 119
-[   22.436234] edt_ft5x06 2-0038: Error applying setting, reverse things back
-
-*/
-
 		reset-gpios = <&pca6408_2 4 GPIO_ACTIVE_LOW>;
 		interrupt-parent = <&gpio1>;
 		interrupts = <7 IRQ_TYPE_EDGE_FALLING>;

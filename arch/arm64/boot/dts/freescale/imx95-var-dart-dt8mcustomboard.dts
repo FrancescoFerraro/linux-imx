@@ -220,15 +220,13 @@
 		compatible = "edt,edt-ft5206";
 		reg = <0x38>;
 		pinctrl-names = "default";
-		pinctrl-0 = <&pinctrl_captouch>;
 		reset-gpios = <&pca6408_2 4 GPIO_ACTIVE_LOW>;
-		interrupt-parent = <&gpio1>;
-		interrupts = <7 IRQ_TYPE_EDGE_FALLING>;
 		touchscreen-size-x = <800>;
 		touchscreen-size-y = <480>;
 		touchscreen-inverted-x;
 		touchscreen-inverted-y;
 		wakeup-source;
+		poll-interval = <100>;
 		status = "okay";
 	};
 
@@ -367,12 +365,6 @@
 			IMX95_PAD_ENET2_RD1__NETCMIX_TOP_ETH1_RGMII_RD1		0x57e
 			IMX95_PAD_ENET2_RD2__NETCMIX_TOP_ETH1_RGMII_RD2		0x57e
 			IMX95_PAD_ENET2_RD3__NETCMIX_TOP_ETH1_RGMII_RD3		0x57e
-		>;
-	};
-
-	pinctrl_captouch: captouchgrp {
-		fsl,pins = <
-			IMX95_PAD_UART2_TXD__AONMIX_TOP_GPIO1_IO_BIT7		0x31e
 		>;
 	};
 

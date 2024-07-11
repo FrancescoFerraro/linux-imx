@@ -297,8 +297,9 @@ static const struct regmap_config edt_M06_i2c_regmap_config = {
 	.write = edt_M06_i2c_write,
 };
 
-static void edt_ft5x06_process(struct edt_ft5x06_ts_data *tsdata)
+static irqreturn_t edt_ft5x06_ts_isr(int irq, void *dev_id)
 {
+	struct edt_ft5x06_ts_data *tsdata = dev_id;
 	struct device *dev = &tsdata->client->dev;
 	u8 rdbuf[63];
 	int i, type, x, y, id;
@@ -312,7 +313,7 @@ static void edt_ft5x06_process(struct edt_ft5x06_ts_data *tsdata)
 	if (error) {
 		dev_err_ratelimited(dev, "Unable to fetch data, error: %d\n",
 				    error);
-		return;
+		goto out;
 	}
 
 	for (i = 0; i < tsdata->max_support_points; i++) {
@@ -355,23 +356,10 @@ static void edt_ft5x06_process(struct edt_ft5x06_ts_data *tsdata)
 
 	input_mt_report_pointer_emulation(tsdata->input, true);
 	input_sync(tsdata->input);
-}
 
-static irqreturn_t edt_ft5x06_ts_isr(int irq, void *dev_id)
-{
-	struct edt_ft5x06_ts_data *tsdata = dev_id;
-
-	edt_ft5x06_process(tsdata);
+out:
 	return IRQ_HANDLED;
 }
-
-static void edt_ft5x06_ts_poll(struct input_dev *dev)
-{
-	struct edt_ft5x06_ts_data *tsdata = input_get_drvdata(dev);
-
-	edt_ft5x06_process(tsdata);
-}
-
 
 struct edt_ft5x06_attribute {
 	struct device_attribute dattr;
@@ -1166,7 +1154,6 @@ static int edt_ft5x06_ts_probe(struct i2c_client *client)
 	unsigned int val;
 	struct input_dev *input;
 	unsigned long irq_flags;
-	u32 poll_interval = 0;
 	int error;
 	u32 report_rate;
 
@@ -1344,32 +1331,17 @@ static int edt_ft5x06_ts_probe(struct i2c_client *client)
 		return error;
 	}
 
-	device_property_read_u32(&client->dev, "poll-interval",
-				 &poll_interval);
-	if (poll_interval) {
-		error = input_setup_polling(input, edt_ft5x06_ts_poll);
-		if (error) {
-			dev_err(&client->dev,
-				"Unable to set up polling mode: %d\n", error);
-			return error;
-		}
-		input_set_drvdata(input, tsdata);
-		input_set_poll_interval(input, poll_interval);
-		dev_info(&client->dev, "Polling device at %dms\n",
-			 poll_interval);
-	} else {
-		irq_flags = irq_get_trigger_type(client->irq);
-		if (irq_flags == IRQF_TRIGGER_NONE)
-			irq_flags = IRQF_TRIGGER_FALLING;
-		irq_flags |= IRQF_ONESHOT;
+	irq_flags = irq_get_trigger_type(client->irq);
+	if (irq_flags == IRQF_TRIGGER_NONE)
+		irq_flags = IRQF_TRIGGER_FALLING;
+	irq_flags |= IRQF_ONESHOT;
 
-		error = devm_request_threaded_irq(&client->dev, client->irq,
-						NULL, edt_ft5x06_ts_isr, irq_flags,
-						client->name, tsdata);
-		if (error) {
-			dev_err(&client->dev, "Unable to request touchscreen IRQ.\n");
-			return error;
-		}
+	error = devm_request_threaded_irq(&client->dev, client->irq,
+					  NULL, edt_ft5x06_ts_isr, irq_flags,
+					  client->name, tsdata);
+	if (error) {
+		dev_err(&client->dev, "Unable to request touchscreen IRQ.\n");
+		return error;
 	}
 
 	error = devm_device_add_group(&client->dev, &edt_ft5x06_attr_group);

@@ -169,6 +169,12 @@
 	status = "okay";
 };
 
+&flexcan1 {
+	pinctrl-names = "default";
+	pinctrl-0 = <&pinctrl_flexcan1>;
+	status = "okay";
+};
+
 &gpio1 {
 	status = "okay";
 };
@@ -421,6 +427,13 @@
 	pinctrl_pwm_backlight: backlightgrp {
 		fsl,pins = <
 			IMX95_PAD_GPIO_IO25__TPM4_CH3					0x51e
+		>;
+	};
+
+	pinctrl_flexcan1: flexcan1grp {
+		fsl,pins = <
+			IMX95_PAD_PDM_CLK__AONMIX_TOP_CAN1_TX		0x39e
+			IMX95_PAD_PDM_BIT_STREAM0__AONMIX_TOP_CAN1_RX	0x39e
 		>;
 	};
 

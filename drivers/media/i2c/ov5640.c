@@ -2797,7 +2797,7 @@ static int ov5640_get_fmt(struct v4l2_subdev *sd,
 	mutex_lock(&sensor->lock);
 
 	if (format->which == V4L2_SUBDEV_FORMAT_TRY)
-		fmt = v4l2_subdev_state_get_format(sd_state, format->pad);
+		fmt = v4l2_subdev_get_try_format(&sensor->sd, sd_state, format->pad);
 	else
 		fmt = &sensor->fmt;
 
@@ -2970,7 +2970,7 @@ static int ov5640_set_fmt(struct v4l2_subdev *sd,
 		goto out;
 
 	if (format->which == V4L2_SUBDEV_FORMAT_TRY) {
-		*v4l2_subdev_state_get_format(sd_state, 0) = *mbus_fmt;
+		*v4l2_subdev_get_try_format(sd, sd_state, 0) = *mbus_fmt;
 		goto out;
 	}
 
@@ -3614,8 +3614,6 @@ static int ov5640_get_frame_interval(struct v4l2_subdev *sd,
 	 * FIXME: Implement support for V4L2_SUBDEV_FORMAT_TRY, using the V4L2
 	 * subdev active state API.
 	 */
-	if (fi->which != V4L2_SUBDEV_FORMAT_ACTIVE)
-		return -EINVAL;
 
 	mutex_lock(&sensor->lock);
 	fi->interval = sensor->frame_interval;
@@ -3636,8 +3634,6 @@ static int ov5640_set_frame_interval(struct v4l2_subdev *sd,
 	 * FIXME: Implement support for V4L2_SUBDEV_FORMAT_TRY, using the V4L2
 	 * subdev active state API.
 	 */
-	if (fi->which != V4L2_SUBDEV_FORMAT_ACTIVE)
-		return -EINVAL;
 
 	if (fi->pad != 0)
 		return -EINVAL;
@@ -3765,8 +3761,8 @@ static int ov5640_init_state(struct v4l2_subdev *sd,
 {
 	struct ov5640_dev *sensor = to_ov5640_dev(sd);
 	struct v4l2_mbus_framefmt *fmt =
-				v4l2_subdev_state_get_format(state, 0);
-	struct v4l2_rect *crop = v4l2_subdev_state_get_crop(state, 0);
+				v4l2_subdev_get_try_format(sd, state, 0);
+	struct v4l2_rect *crop = v4l2_subdev_get_try_crop(sd, state, 0);
 
 	*fmt = ov5640_is_csi2(sensor) ? ov5640_csi2_default_fmt :
 					ov5640_dvp_default_fmt;
@@ -3794,8 +3790,6 @@ static const struct v4l2_subdev_pad_ops ov5640_pad_ops = {
 	.get_fmt = ov5640_get_fmt,
 	.set_fmt = ov5640_set_fmt,
 	.get_selection = ov5640_get_selection,
-	.get_frame_interval = ov5640_get_frame_interval,
-	.set_frame_interval = ov5640_set_frame_interval,
 	.enum_frame_size = ov5640_enum_frame_size,
 	.enum_frame_interval = ov5640_enum_frame_interval,
 };
@@ -3804,10 +3798,6 @@ static const struct v4l2_subdev_ops ov5640_subdev_ops = {
 	.core = &ov5640_core_ops,
 	.video = &ov5640_video_ops,
 	.pad = &ov5640_pad_ops,
-};
-
-static const struct v4l2_subdev_internal_ops ov5640_internal_ops = {
-	.init_state = ov5640_init_state,
 };
 
 static int ov5640_get_regulators(struct ov5640_dev *sensor)
@@ -3924,7 +3914,6 @@ static int ov5640_probe(struct i2c_client *client)
 		return PTR_ERR(sensor->reset_gpio);
 
 	v4l2_i2c_subdev_init(&sensor->sd, client, &ov5640_subdev_ops);
-	sensor->sd.internal_ops = &ov5640_internal_ops;
 
 	sensor->sd.flags |= V4L2_SUBDEV_FL_HAS_DEVNODE |
 			    V4L2_SUBDEV_FL_HAS_EVENTS;

@@ -3604,81 +3604,6 @@ static int ov5640_enum_frame_interval(
 	return 0;
 }
 
-static int ov5640_get_frame_interval(struct v4l2_subdev *sd,
-				     struct v4l2_subdev_state *sd_state,
-				     struct v4l2_subdev_frame_interval *fi)
-{
-	struct ov5640_dev *sensor = to_ov5640_dev(sd);
-
-	/*
-	 * FIXME: Implement support for V4L2_SUBDEV_FORMAT_TRY, using the V4L2
-	 * subdev active state API.
-	 */
-
-	mutex_lock(&sensor->lock);
-	fi->interval = sensor->frame_interval;
-	mutex_unlock(&sensor->lock);
-
-	return 0;
-}
-
-static int ov5640_set_frame_interval(struct v4l2_subdev *sd,
-				     struct v4l2_subdev_state *sd_state,
-				     struct v4l2_subdev_frame_interval *fi)
-{
-	struct ov5640_dev *sensor = to_ov5640_dev(sd);
-	const struct ov5640_mode_info *mode;
-	int frame_rate, ret = 0;
-
-	/*
-	 * FIXME: Implement support for V4L2_SUBDEV_FORMAT_TRY, using the V4L2
-	 * subdev active state API.
-	 */
-
-	if (fi->pad != 0)
-		return -EINVAL;
-
-	mutex_lock(&sensor->lock);
-
-	if (sensor->streaming) {
-		ret = -EBUSY;
-		goto out;
-	}
-
-	mode = sensor->current_mode;
-
-	frame_rate = ov5640_try_frame_interval(sensor, &fi->interval, mode);
-	if (frame_rate < 0) {
-		/* Always return a valid frame interval value */
-		fi->interval = sensor->frame_interval;
-		goto out;
-	}
-
-	mode = ov5640_find_mode(sensor, mode->width, mode->height, true);
-	if (!mode) {
-		ret = -EINVAL;
-		goto out;
-	}
-
-	if (ov5640_framerates[frame_rate] > ov5640_framerates[mode->max_fps]) {
-		ret = -EINVAL;
-		goto out;
-	}
-
-	if (mode != sensor->current_mode ||
-	    frame_rate != sensor->current_fr) {
-		sensor->current_fr = frame_rate;
-		sensor->frame_interval = fi->interval;
-		sensor->current_mode = mode;
-		sensor->pending_mode_change = true;
-
-		ov5640_update_pixel_rate(sensor);
-	}
-out:
-	mutex_unlock(&sensor->lock);
-	return ret;
-}
-
 static int ov5640_enum_mbus_code(struct v4l2_subdev *sd,
 				 struct v4l2_subdev_state *sd_state,
 				 struct v4l2_subdev_mbus_code_enum *code)
@@ -3754,25 +3679,6 @@ out:
 	}
 
 	return ret;
-}
-
-static int ov5640_init_state(struct v4l2_subdev *sd,
-			     struct v4l2_subdev_state *state)
-{
-	struct ov5640_dev *sensor = to_ov5640_dev(sd);
-	struct v4l2_mbus_framefmt *fmt =
-				v4l2_subdev_get_try_format(sd, state, 0);
-	struct v4l2_rect *crop = v4l2_subdev_get_try_crop(sd, state, 0);
-
-	*fmt = ov5640_is_csi2(sensor) ? ov5640_csi2_default_fmt :
-					ov5640_dvp_default_fmt;
-
-	crop->left = OV5640_PIXEL_ARRAY_LEFT;
-	crop->top = OV5640_PIXEL_ARRAY_TOP;
-	crop->width = OV5640_PIXEL_ARRAY_WIDTH;
-	crop->height = OV5640_PIXEL_ARRAY_HEIGHT;
-
-	return 0;
 }
 
 static const struct v4l2_subdev_core_ops ov5640_core_ops = {

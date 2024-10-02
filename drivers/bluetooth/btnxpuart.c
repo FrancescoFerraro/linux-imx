@@ -1167,6 +1167,17 @@ static int nxp_setup(struct hci_dev *hdev)
 		if (err < 0)
 			return err;
 	} else {
+		/* The combo firmware might be loaded by the Wi-Fi driver over SDIO (mwifiex_sdio).
+		 * We wait up to 10s for the CTS to go up. Afterwards, we know that the firmware is
+		 * really ready.
+		 */
+printk("FF:1 \n");
+		err = serdev_device_wait_for_cts(nxpdev->serdev, true, 10000);
+		if (err) {
+			bt_dev_err(nxpdev->hdev, "Wait for CTS failed with %d", err);
+			return err;
+		}
+
 		bt_dev_info(hdev, "FW already running.");
 		clear_bit(BTNXPUART_FW_DOWNLOADING, &nxpdev->tx_state);
 	}

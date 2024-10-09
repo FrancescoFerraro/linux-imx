@@ -298,10 +298,6 @@
 	status = "okay";
 };
 
-&scmi_misc {
-	status="disabled";
-};
-
 &scmi_iomuxc {
 	pinctrl_bt: btgrp {
 		fsl,pins = <

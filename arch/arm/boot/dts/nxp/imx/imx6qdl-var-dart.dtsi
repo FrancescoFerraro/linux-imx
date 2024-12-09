@@ -78,7 +78,7 @@
 		regulator-max-microvolt = <1800000>;
 
 		/* WLAN_EN GPIO for this board - Bank5, pin13 */
-		gpio = <&gpio7 8 0>;
+		gpio = <&gpio7 8 GPIO_ACTIVE_HIGH>;
 
 		/* WLAN card specific delay */
 		startup-delay-us = <70000>;
@@ -337,17 +337,8 @@
 };
 
 &iomuxc {
-	pinctrl-names = "default";
-	pinctrl-0 = <&pinctrl_hog>;
 
 	imx6qdl-var-som-mx6 {
-
-		pinctrl_hog: hoggrp {
-			fsl,pins = <
-				/* for Bluetooth/wifi enable */
-				MX6QDL_PAD_SD3_DAT6__GPIO6_IO18		0x1b0b1
-			>;
-		};
 
 		pinctrl_audmux_2: audmux {
 			fsl,pins = <
@@ -355,6 +346,15 @@
 				MX6QDL_PAD_CSI0_DAT4__AUD3_TXC		0x130b0
 				MX6QDL_PAD_CSI0_DAT5__AUD3_TXD		0x110b0
 				MX6QDL_PAD_CSI0_DAT6__AUD3_TXFS		0x130b0
+			>;
+		};
+
+		pinctrl_bt: bt {
+			fsl,pins = <
+				/* Bluetooth enable */
+				MX6QDL_PAD_SD3_DAT6__GPIO6_IO18		0x1b0b1
+				/* Bluetooth Slow Clock */
+				MX6QDL_PAD_ENET_RXD0__OSC32K_32K_OUT	0x000b0
 			>;
 		};
 
@@ -443,7 +443,7 @@
 		};
 
 		/* Variscite Bluetooth */
-		pinctrl_uart2_4: uart2grp-4 { /* RTS/CTS only mode */
+		pinctrl_uart2: uart2grp { /* RTS/CTS only mode */
 			fsl,pins = <
 				MX6QDL_PAD_SD3_DAT4__UART2_RX_DATA	0x1b0b1
 				MX6QDL_PAD_SD3_DAT5__UART2_TX_DATA	0x1b0b1
@@ -624,9 +624,14 @@
 /* Bluetooth Uart */
 &uart2 {
 	pinctrl-names = "default";
-	pinctrl-0 = <&pinctrl_uart2_4>;
+	pinctrl-0 = <&pinctrl_uart2 &pinctrl_bt>;
 	uart-has-rtscts;
 	status = "okay";
+
+	bluetooth {
+		compatible = "ti,wl1835-st";
+		enable-gpios = <&gpio6 18 GPIO_ACTIVE_HIGH>;
+	};
 };
 
 &usbh1 {

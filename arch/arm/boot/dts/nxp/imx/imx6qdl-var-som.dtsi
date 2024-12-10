@@ -491,7 +491,7 @@
 			fsl,pins = <
 				/* Bluetooth enable */
 				MX6QDL_PAD_SD3_DAT6__GPIO6_IO18		0x1b0b1
-				/* Bluetooth Slow Clock */
+				/* Bluetooth / Wifi Slow Clock */
 				MX6QDL_PAD_ENET_RXD0__OSC32K_32K_OUT	0x000b0
 			>;
 		};
@@ -686,8 +686,6 @@
 			fsl,pins = <
 				/* for wifi irq */
 				MX6QDL_PAD_SD3_DAT7__GPIO6_IO17		0x130F9
-				/* Wifi Slow Clock */
-				MX6QDL_PAD_ENET_RXD0__OSC32K_32K_OUT	0x000b0
 			>;
 		};
 	};

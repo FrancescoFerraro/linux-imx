@@ -966,7 +966,7 @@ static int mxc_isi_source_fmt_init(struct mxc_isi_cap_dev *isi_cap)
 	src_fmt.format.height = dst_f->height;
 	ret = v4l2_subdev_call(src_sd, pad, set_fmt, NULL, &src_fmt);
 	if (ret < 0 && ret != -ENOIOCTLCMD) {
-		v4l2_err(&isi_cap->sd, "set remote fmt fail!\n");
+		v4l2_err(&isi_cap->sd, "set remote fmt fail! %d sd: %s pad:%d\n", ret, src_sd->entity.name, source_pad->index);
 		return ret;
 	}
 

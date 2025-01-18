@@ -610,7 +610,7 @@ static int subdev_notifier_complete(struct v4l2_async_notifier *notifier)
 unlock:
 	mutex_unlock(&mxc_md->media_dev.graph_mutex);
 	if (ret < 0) {
-		v4l2_err(&mxc_md->v4l2_dev, "%s error exit\n", __func__);
+		v4l2_err(&mxc_md->v4l2_dev, "%s error exit ret=%d\n", __func__, ret);
 		return ret;
 	}
 

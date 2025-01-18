@@ -519,8 +519,10 @@ static int mxc_md_create_links(struct mxc_md *mxc_md)
 
 			source = &sensor->sd->entity;
 			sink = find_entity_by_name(mxc_md, mipi_csi2->sd_name);
-			source_pad = 0;
-			sink_pad = source_pad;
+			source_pad = media_get_pad_index(source, MEDIA_PAD_FL_SOURCE, 0);
+			if (source_pad < 0)
+				continue;
+			sink_pad = 0;
 
 			mipi_vc = (mipi_csi2->vchannel) ? 4 : 1;
 			for (j = 0; j < mipi_vc; j++) {
@@ -529,6 +531,7 @@ static int mxc_md_create_links(struct mxc_md *mxc_md)
 							    sink,
 							    sink_pad + j,
 							    MEDIA_LNK_FL_IMMUTABLE |
+							    MEDIA_LNK_FL_DATA_LINK |
 							    MEDIA_LNK_FL_ENABLED);
 				if (ret)
 					return ret;

@@ -271,12 +271,8 @@
 		clocks = <&clk_ov5640_fixed>;
 		clock-names = "xclk";
 		assigned-clock-rates = <24000000>;
-		csi_id = <0>;
 		powerdown-gpios = <&pca6408_1 3 GPIO_ACTIVE_HIGH>;
 		reset-gpios = <&pca6408_1 1 GPIO_ACTIVE_LOW>;
-		mclk = <24000000>;
-		mclk_source = <0>;
-		mipi_csi;
 		status = "okay";
 
 		port {

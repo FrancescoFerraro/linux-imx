@@ -377,7 +377,7 @@ struct reg_value {
 struct ov5640_timings {
 	/* Analog crop rectangle. */
 	struct v4l2_rect analog_crop;
-	/* Visibile crop: from analog crop top-left corner. */
+	/* Visible crop: from analog crop top-left corner. */
 	struct v4l2_rect crop;
 	/* Total pixels per line: width + fixed hblank. */
 	u32 htot;
@@ -399,7 +399,7 @@ struct ov5640_mode_info {
 	const struct reg_value *reg_data;
 	u32 reg_data_size;
 
-	/* Used by s_frame_interval only. */
+	/* Used by set_frame_interval only. */
 	u32 max_fps;
 	u32 def_fps;
 };
@@ -1982,6 +1982,7 @@ static int ov5640_get_light_freq(struct ov5640_dev *sensor)
 			light_freq = 50;
 		} else {
 			/* 60Hz */
+			light_freq = 60;
 		}
 	}
 
@@ -2797,8 +2798,7 @@ static int ov5640_get_fmt(struct v4l2_subdev *sd,
 	mutex_lock(&sensor->lock);
 
 	if (format->which == V4L2_SUBDEV_FORMAT_TRY)
-		fmt = v4l2_subdev_get_try_format(&sensor->sd, sd_state,
-						 format->pad);
+		fmt = v4l2_subdev_get_try_format(&sensor->sd, sd_state, format->pad);
 	else
 		fmt = &sensor->fmt;
 
@@ -3605,10 +3605,16 @@ static int ov5640_enum_frame_interval(
 	return 0;
 }
 
-static int ov5640_g_frame_interval(struct v4l2_subdev *sd,
-				   struct v4l2_subdev_frame_interval *fi)
+static int ov5640_get_frame_interval(struct v4l2_subdev *sd,
+				     struct v4l2_subdev_state *sd_state,
+				     struct v4l2_subdev_frame_interval *fi)
 {
 	struct ov5640_dev *sensor = to_ov5640_dev(sd);
+
+	/*
+	 * FIXME: Implement support for V4L2_SUBDEV_FORMAT_TRY, using the V4L2
+	 * subdev active state API.
+	 */
 
 	mutex_lock(&sensor->lock);
 	fi->interval = sensor->frame_interval;
@@ -3617,12 +3623,18 @@ static int ov5640_g_frame_interval(struct v4l2_subdev *sd,
 	return 0;
 }
 
-static int ov5640_s_frame_interval(struct v4l2_subdev *sd,
-				   struct v4l2_subdev_frame_interval *fi)
+static int ov5640_set_frame_interval(struct v4l2_subdev *sd,
+				     struct v4l2_subdev_state *sd_state,
+				     struct v4l2_subdev_frame_interval *fi)
 {
 	struct ov5640_dev *sensor = to_ov5640_dev(sd);
 	const struct ov5640_mode_info *mode;
 	int frame_rate, ret = 0;
+
+	/*
+	 * FIXME: Implement support for V4L2_SUBDEV_FORMAT_TRY, using the V4L2
+	 * subdev active state API.
+	 */
 
 	if (fi->pad != 0)
 		return -EINVAL;
@@ -3745,8 +3757,8 @@ out:
 	return ret;
 }
 
-static int ov5640_init_cfg(struct v4l2_subdev *sd,
-			   struct v4l2_subdev_state *state)
+static int ov5640_init_state(struct v4l2_subdev *sd,
+			     struct v4l2_subdev_state *state)
 {
 	struct ov5640_dev *sensor = to_ov5640_dev(sd);
 	struct v4l2_mbus_framefmt *fmt =
@@ -3771,13 +3783,10 @@ static const struct v4l2_subdev_core_ops ov5640_core_ops = {
 };
 
 static const struct v4l2_subdev_video_ops ov5640_video_ops = {
-	.g_frame_interval = ov5640_g_frame_interval,
-	.s_frame_interval = ov5640_s_frame_interval,
 	.s_stream = ov5640_s_stream,
 };
 
 static const struct v4l2_subdev_pad_ops ov5640_pad_ops = {
-	.init_cfg = ov5640_init_cfg,
 	.enum_mbus_code = ov5640_enum_mbus_code,
 	.get_fmt = ov5640_get_fmt,
 	.set_fmt = ov5640_set_fmt,
@@ -3984,8 +3993,8 @@ static const struct dev_pm_ops ov5640_pm_ops = {
 };
 
 static const struct i2c_device_id ov5640_id[] = {
-	{"ov5640", 0},
-	{},
+	{ "ov5640" },
+	{}
 };
 MODULE_DEVICE_TABLE(i2c, ov5640_id);
 

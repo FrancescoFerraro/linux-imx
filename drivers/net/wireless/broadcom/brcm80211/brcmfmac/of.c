@@ -131,7 +131,7 @@ void brcmf_of_probe(struct device *dev, enum brcmf_bus_type bus_type,
 
 	/* Laird - Get regdomain/country code string if it exists */
 	if (of_property_read_string(np, "laird,regdomain", &domain) == 0)
-		strlcpy(settings->regdomain, domain, BRCMF_REGDOMAIN_LEN);
+		strncpy(settings->regdomain, domain, BRCMF_REGDOMAIN_LEN);
 
 	if (of_property_read_u32(np, "brcm,drive-strength", &val) == 0)
 		sdio->drive_strength = val;

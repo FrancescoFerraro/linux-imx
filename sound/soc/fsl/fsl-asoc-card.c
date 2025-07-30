@@ -241,7 +241,7 @@ static int fsl_asoc_card_hw_params(struct snd_pcm_substream *substream,
 	}
 
 	if (of_device_is_compatible(dev->of_node, "fsl,imx-audio-wm8904")) {
-		ret = snd_soc_dai_set_tdm_slot(asoc_rtd_to_cpu(rtd, 0), 0, 0, 2,
+		ret = snd_soc_dai_set_tdm_slot(snd_soc_rtd_to_cpu(rtd, 0), 0, 0, 2,
 					       params_physical_width(params));
 		if (ret) {
 			dev_err(dev, "failed to set TDM slot for cpu dai\n");
@@ -253,7 +253,7 @@ static int fsl_asoc_card_hw_params(struct snd_pcm_substream *substream,
 		else
 			pll_out = priv->sample_rate * 256;
 
-		ret = snd_soc_dai_set_pll(asoc_rtd_to_codec(rtd, 0), codec_priv->pll_id,
+		ret = snd_soc_dai_set_pll(snd_soc_rtd_to_codec(rtd, 0), codec_priv->pll_id,
 					  codec_priv->pll_id,
 					  codec_priv->mclk_freq, pll_out);
 		if (ret) {
@@ -261,7 +261,7 @@ static int fsl_asoc_card_hw_params(struct snd_pcm_substream *substream,
 			return ret;
 		}
 
-		ret = snd_soc_dai_set_sysclk(asoc_rtd_to_codec(rtd, 0), codec_priv->fll_id,
+		ret = snd_soc_dai_set_sysclk(snd_soc_rtd_to_codec(rtd, 0), codec_priv->fll_id,
 					     pll_out, SND_SOC_CLOCK_IN);
 		if (ret) {
 			dev_err(dev, "failed to set SYSCLK: %d\n", ret);

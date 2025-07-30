@@ -32,7 +32,6 @@
 	fixed-link {
 		speed = <10000>;
 		full-duplex;
-		link-gpios = <&pca9534 1 GPIO_ACTIVE_LOW>;
 	};
 };
 

@@ -93,7 +93,7 @@
 		regulator-max-microvolt = <1800000>;
 		regulator-always-on;
 	};
-	
+
 	vddio_phy1: vddio-phy1 {
 		compatible = "regulator-fixed";
 		regulator-name = "vddio_phy1_1v8";
@@ -119,20 +119,6 @@
 	cpu-supply = <&buck2>;
 };
 
-&ecspi1 {
-	pinctrl-names = "default";
-	pinctrl-0 = <&pinctrl_ecspi1>;
-	cs-gpios = <&gpio5 17 GPIO_ACTIVE_LOW>;
-	status = "okay";
-	
-	spidev@0 {
-		compatible = "var,spidev";
-		reg = <0>;
-		spi-max-frequency = <12000000>;
-		status = "okay";
-	};
-};
-
 &eqos {
 	pinctrl-names = "default";
 	pinctrl-0 = <&pinctrl_eqos>;
@@ -152,8 +138,10 @@
 			reset-assert-us = <10000>;
 			reset-deassert-us = <100000>;
 			vddio-supply = <&vddio_phy0>;
+			ti,min-output-impedance;
+			enet-phy-lane-no-swap;
 		};
-		
+
 		ethphy1: ethernet-phy@5 {
 			compatible = "ethernet-phy-ieee802.3-c22";
 			reg = <5>;
@@ -161,6 +149,8 @@
 			reset-assert-us = <10000>;
 			reset-deassert-us = <20000>;
 			vddio-supply = <&vddio_phy1>;
+			ti,min-output-impedance;
+			enet-phy-lane-no-swap;
 		};
 	};
 };
@@ -292,6 +282,44 @@
 		};
 	};
 
+	/* GPIO expander */
+	pcal6416: i2c1-gpio-expander@20 {
+		compatible = "nxp,pcal6416";
+		#gpio-cells = <2>;
+		gpio-controller;
+		reg = <0x20>;
+		interrupt-controller;
+		#interrupt-cells = <2>;
+		interrupt-parent = <&gpio4>;
+		interrupts = <5 IRQ_TYPE_LEVEL_LOW>;
+		pinctrl-names = "default";
+		pinctrl-0 = <&pinctrl_pcal6416>;
+		reset-gpios = <&gpio4 3 GPIO_ACTIVE_LOW>;
+		status = "okay";
+	};
+
+
+	/* PCF85263A RTC module */
+	rtc@51 {
+		compatible = "nxp,pcf85263";
+		reg = <0x51>;
+		status = "okay";
+	};
+
+	/* TPM */
+	st33ktpm2xi2c: st33ktpm2xi2c@2e {
+		compatible = "infineon,slb9673";
+		label = "tpm";
+		reg = <0x2e>;
+		/*
+		* reset-gpios is not used by the TPM driver, but forces
+		* probe ordering: ensures GPIO expander is initialized
+		* before the TPM driver probes.
+		*/
+		reset-gpios = <&pcal6416 13 GPIO_ACTIVE_LOW>;
+		status = "okay";
+	};
+
 	wm8904: codec@1a {
 		compatible = "wlf,wm8904";
 		#sound-dai-cells = <0>;
@@ -324,42 +352,9 @@
 		>;
 		status = "okay";
 	};
-	
-	/* GPIO expander */
-	pcal6416: i2c1-gpio-expander@20 {
-	        compatible = "nxp,pcal6416";
-	        #gpio-cells = <2>;
-	        gpio-controller;
-	        reg = <0x20>;
-	        interrupt-controller;
-	        #interrupt-cells = <2>;
-	        interrupt-parent = <&gpio4>;
-	        interrupts = <5 IRQ_TYPE_LEVEL_LOW>;
-	        pinctrl-names = "default";
-	        pinctrl-0 = <&pinctrl_pcal6416>;
-		reset-gpios = <&gpio4 3 GPIO_ACTIVE_LOW>;
-		status = "okay";
-
-		/* Set USB_HUB_GRST as input to release TUSB8041 HUB from reset state */
-		hub_usb_grst {
-			gpio-hog;
-			gpios = <11 GPIO_ACTIVE_LOW>;
-			input;
-			line-name = "hub_usb_grst";
-		};
-    };  
 };
 
 &iomuxc {
-	pinctrl_ecspi1: ecspi1grp {
-		fsl,pins = <
-			MX8MP_IOMUXC_I2C1_SCL__ECSPI1_SCLK				0x12
-			MX8MP_IOMUXC_I2C1_SDA__ECSPI1_MOSI				0x12
-			MX8MP_IOMUXC_I2C2_SCL__ECSPI1_MISO				0x12
-			MX8MP_IOMUXC_I2C2_SDA__GPIO5_IO17				0x12
-		>;
-	};
-
 	pinctrl_eqos: eqosgrp {
 		fsl,pins = <
 			MX8MP_IOMUXC_ENET_MDC__ENET_QOS_MDC				0x2
@@ -536,7 +531,7 @@
 			MX8MP_IOMUXC_SD1_STROBE__GPIO2_IO11				0xc0 /* BT_EN */
 		>;
 	};
-	
+
 	pinctrl_pcal6416: pcal6416grp {
 		fsl,pins = <
 		MX8MP_IOMUXC_SAI1_RXD3__GPIO4_IO05					0xc0

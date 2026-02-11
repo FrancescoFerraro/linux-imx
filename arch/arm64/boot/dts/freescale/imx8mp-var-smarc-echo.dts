@@ -197,6 +197,20 @@
 	status = "okay";
 };
 
+&ecspi1 {
+	pinctrl-names = "default";
+	pinctrl-0 = <&pinctrl_ecspi1>;
+	cs-gpios = <&gpio5 17 GPIO_ACTIVE_LOW>;
+	status = "okay";
+
+	spidev@0 {
+		compatible = "var,spidev";
+		reg = <0>;
+		spi-max-frequency = <12000000>;
+		status = "okay";
+	};
+};
+
 &ecspi2 {
 	pinctrl-names = "default";
 	pinctrl-0 = <&pinctrl_ecspi2>;
@@ -347,13 +361,6 @@
 		#gpio-cells = <2>;
 	};
 
-	/* DS1337 RTC module */
-	rtc@68 {
-		compatible = "dallas,ds1337";
-		reg = <0x68>;
-		status = "okay";
-	};
-
 	/* Capacitive touch controller */
 	ft5x06_ts: ft5x06_ts@38 {
 		compatible = "edt,edt-ft5206";
@@ -448,6 +455,15 @@
 	pinctrl_captouch: captouchgrp {
 		fsl,pins = <
 			MX8MP_IOMUXC_GPIO1_IO14__GPIO1_IO14				0x16
+		>;
+	};
+
+	pinctrl_ecspi1: ecspi1grp {
+		fsl,pins = <
+			MX8MP_IOMUXC_I2C1_SCL__ECSPI1_SCLK				0x12
+			MX8MP_IOMUXC_I2C1_SDA__ECSPI1_MOSI				0x12
+			MX8MP_IOMUXC_I2C2_SCL__ECSPI1_MISO				0x12
+			MX8MP_IOMUXC_I2C2_SDA__GPIO5_IO17				0x12
 		>;
 	};
 
@@ -620,7 +636,6 @@
 
 	pinctrl_usdhc2_gpio: usdhc2grp-gpio {
 		fsl,pins = <
-			
 			MX8MP_IOMUXC_SD2_CD_B__GPIO2_IO12				0x10  //card detect
 			MX8MP_IOMUXC_GPIO1_IO08__GPIO1_IO08				0x1c4 //power enable
 			MX8MP_IOMUXC_GPIO1_IO04__GPIO1_IO04				0xc0  //vselect
